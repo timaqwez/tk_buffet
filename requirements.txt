@@ -1,0 +1,3 @@
+flet-manager==0.2
+flet==0.9.0
+httpx==0.24.1
