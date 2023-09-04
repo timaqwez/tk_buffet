@@ -35,16 +35,15 @@ class SearchView(View):
             cursor_width=2,
             label='Поиск',
             label_style=TextStyle(
-                font_family='Regular',
+                font_family=self.app.theme.text_style_small_regular.font_family,
                 color=self.app.theme.primary_color,
-                size=20,
-
+                size=self.app.theme.text_style_medium_regular.size,
             ),
             focused_bgcolor='black',
             text_style=TextStyle(
-                font_family='Regular',
+                font_family=self.app.theme.text_style_small_regular.font_family,
                 color=self.app.theme.primary_color,
-                size=35
+                size=self.app.theme.text_style_large_regular.size,
             ),
             border=InputBorder.NONE,
             visible=True,
@@ -76,9 +75,11 @@ class SearchView(View):
                     vertical_alignment=CrossAxisAlignment.END,
                     spacing=0,
                 ),
-                margin=margin.only(top=10,
-                                   left=20,
-                                   right=20),
+                margin=margin.only(
+                    left=20,
+                    right=20,
+                    bottom=10
+                ),
                 border=border.only(
                     bottom=BorderSide(
                         width=1,
@@ -121,7 +122,6 @@ class SearchView(View):
                             ),
                             padding=padding.only(
                                 bottom=10,
-                                top=10
                             ),
                             margin=margin.only(
                                 left=20,

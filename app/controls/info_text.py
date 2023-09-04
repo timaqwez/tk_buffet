@@ -1,4 +1,4 @@
-from flet_core import BorderSide, Column, Container, Text, alignment, border, margin, padding
+from flet_core import BorderSide, Column, Container, Text, TextThemeStyle, alignment, border, margin, padding
 from flet_manager import App
 
 
@@ -18,7 +18,7 @@ class InfoText(Column):
                 content=Text(
                     value=self.text_1,
                     no_wrap=False,
-                    size=30,
+                    style=TextThemeStyle.BODY_LARGE,
                     color=self.app.theme.secondary_color
                 ),
                 alignment=alignment.bottom_left,
@@ -30,7 +30,7 @@ class InfoText(Column):
             Container(
                 content=Text(
                     value=self.text_2,
-                    size=22,
+                    style=TextThemeStyle.BODY_MEDIUM,
                     no_wrap=False,
                     color=self.app.theme.primary_color
                 ),

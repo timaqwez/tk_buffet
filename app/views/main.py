@@ -1,12 +1,16 @@
-from flet_core import BottomSheet, Column, Container, Text, TextField, TextThemeStyle, alignment, border_radius, margin
+import flet
+from flet_core import BottomSheet, Checkbox, Column, Container, Row, Text, TextField, TextThemeStyle, alignment, \
+    border_radius, \
+    margin, padding
 from flet_core import ListView, ResponsiveRow
 from httpx import AsyncClient
 
 from app.controls import ProductCard, View
 from app.controls.category_menu import CategoryMenu
-from app.controls.menu_item import MenuItem
 from app.views import ProductView
 from app.views.search import SearchView
+# from config import API_URL
+from config import API_URL
 
 
 class MainView(View):
@@ -30,7 +34,7 @@ class MainView(View):
         )
 
     async def open_bottom_sheet(self, e):
-        self.bottom_sheet.open = not self.bottom_sheet.open
+        self.bottom_sheet.open = True
         await self.bottom_sheet.update_async()
 
     async def open_product_view(self, e):
@@ -66,6 +70,11 @@ class MainView(View):
             await self.reset_category(e)
             await self.update_products(e)
             return
+        await self.loading()
+        async with AsyncClient(base_url=API_URL) as client:
+            response = await client.get(f'products/{e.control.category_id}')
+            category_products = response.json()['values']
+        self.app.session.current_products = [product for product in category_products]
         self.products.controls[0] = CategoryMenu(
             app=self.app,
             categories=self.app.session.categories,
@@ -74,10 +83,6 @@ class MainView(View):
             on_category_button_click=self.select_category,
             on_close_button_click=self.reset_category,
         )
-        async with AsyncClient(base_url='http://127.0.0.1:8000/') as client:
-            response = await client.get(f'products/{e.control.category_id}')
-            category_products = response.json()['values']
-        self.app.session.current_products = [product for product in category_products]
         await self.update_products(e)
 
     async def update_products(self, e):
@@ -96,8 +101,6 @@ class MainView(View):
         await self.update_async()
 
     async def on_navbar_menu_click(self, e):
-        await self.app.session.load_favorite_ids()
-
         self.products.controls[0] = CategoryMenu(
             app=self.app,
             is_active=False,
@@ -113,48 +116,40 @@ class MainView(View):
         await self.update_products(e)
 
     async def on_navbar_favorite_click(self, e):
-        await self.app.session.load_favorite_ids()
         favorite_ids = self.app.session.favorite_ids
         self.navbar.menu_tab.content.controls[0].selected = False
         self.navbar.favorite_tab.content.controls[0].selected = True
         self.navbar.menu_tab.content.controls[1].color = self.app.theme.secondary_color_dark
         self.navbar.favorite_tab.content.controls[1].color = self.app.theme.primary_color
         if not favorite_ids:
-            self.products.controls[0] = Container(height=40)
+            self.products.controls[0] = Container(height=0)
             self.products.controls[1] = Container(
                 content=Text(
                     value='У вас нет избранного',
-                    style=TextThemeStyle.BODY_MEDIUM,
+                    style=TextThemeStyle.BODY_LARGE,
                     color=self.app.theme.secondary_color_dark
                 ),
                 alignment=alignment.center
             )
             await self.update_async()
             return
-        self.products.controls[0] = Container(height=40)
+        self.products.controls[0] = Container(height=0)
         self.app.session.current_products = [
             product for product in self.app.session.products_extended_info if product['id'] in favorite_ids
         ]
         await self.update_products(e)
 
     async def zhuravskaya_mode_change(self, e):
-        if e.control.value is True:
-            self.app.theme.text_style_small_regular.font_family = 'Times New Roman'
-            self.app.theme.text_style_medium_regular.font_family = 'Times New Roman'
-            self.app.theme.text_style_large_regular.font_family = 'Times New Roman'
-            self.app.theme.text_style_semi_bold.font_family = 'Times New Roman'
-        else:
-            self.app.theme.text_style_small_regular.font_family = 'Regular'
-            self.app.theme.text_style_medium_regular.font_family = 'Regular'
-            self.app.theme.text_style_large_regular.font_family = 'Regular'
-            self.app.theme.text_style_semi_bold.font_family = 'SemiBold'
+        self.app.theme = await self.app.theme.zhuravskaya_mode_switch(e)
+        await self.bottom_sheet.update_async()
+        await self.restart()
         await self.app.page.update_async()
 
     async def dark_mode_change(self, e):
-        self.app.theme = await self.app.theme.switch_theme(self.app.theme)
+        self.app.theme = await self.app.theme.dark_mode_switch(e)
+        self.bottom_sheet.open = False
         await self.restart()
         await self.app.page.update_async()
-        print('changed dark mode')
 
     async def on_search_submit(self, e):
         self.products.controls[0] = Container(
@@ -181,7 +176,7 @@ class MainView(View):
                 Container(
                     content=Text(
                         value='Ничего не найдено',
-                        style=TextThemeStyle.BODY_MEDIUM,
+                        style=TextThemeStyle.BODY_LARGE,
                         color=self.app.theme.secondary_color_dark,
                     ),
                     margin=margin.only(
@@ -195,7 +190,7 @@ class MainView(View):
             Container(
                 content=Text(
                     value='Результаты по запросу ' + f'"{query}":',
-                    style=TextThemeStyle.BODY_MEDIUM,
+                    style=TextThemeStyle.BODY_LARGE,
                     color=self.app.theme.secondary_color_dark,
                 ),
                 margin=margin.only(
@@ -204,9 +199,18 @@ class MainView(View):
                 )
             )
         )
+        await self.save_search_queries()
         await self.update_async()
 
+    async def loading(self):
+        self.products.controls[1] = flet.Image(
+            animate_position=10,
+        )
+        await self.products.update_async()
+
     async def build(self):
+        await self.load_search_queries()
+        await self.load_favorite_ids()
         self.products = ListView(
             controls=[
                 CategoryMenu(app=self.app,
@@ -229,14 +233,47 @@ class MainView(View):
                 ),
             ],
             expand=True,
+            padding=padding.only(
+                top=20,
+            )
         )
 
         self.bottom_sheet = BottomSheet(
             Container(
                 Column(
                     [
-                        MenuItem(self.app, 'Режим Журавской', self.zhuravskaya_mode_change),
-                        MenuItem(self.app, 'Темная тема', self.dark_mode_change)
+                        Container(
+                            content=Row(
+                                controls=[
+                                    Text(
+                                        value='Режим Журавской',
+                                        style=TextThemeStyle.BODY_LARGE,
+                                        color=self.app.theme.primary_color
+                                    ),
+                                    Checkbox(
+                                        value=self.app.theme.is_zhur_mode,
+                                        on_change=self.zhuravskaya_mode_change,
+                                    )
+                                ]
+                            ),
+                            alignment=alignment.center
+                        ),
+                        Container(
+                            content=Row(
+                                controls=[
+                                    Text(
+                                        value='Темная Тема',
+                                        style=TextThemeStyle.BODY_LARGE,
+                                        color=self.app.theme.primary_color
+                                    ),
+                                    Checkbox(
+                                        value=self.app.theme.is_dark_mode,
+                                        on_change=self.dark_mode_change,
+                                    )
+                                ]
+                            ),
+                            alignment=alignment.center
+                        ),
                     ],
                     tight=True,
                 ),
@@ -245,12 +282,12 @@ class MainView(View):
                 border_radius=border_radius.only(
                     top_left=15,
                     top_right=15
-                )
+                ),
             ),
-            open=False
         )
+        self.app.page.overlay.append(self.bottom_sheet)
         self.controls = [
             self.products,
-            self.bottom_sheet,
         ]
         await self.create()
+

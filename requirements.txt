@@ -1,3 +1,4 @@
-flet-manager==0.2
-flet==0.9.0
+flet-manager==0.2.1
+flet==0.10.0
 httpx==0.24.1
+flet-fastapi==0.10.0

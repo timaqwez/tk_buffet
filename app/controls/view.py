@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from flet_core import Control
+from flet_core import Control, PageTransitionTheme
 from flet_manager.views import BaseView
 
 from app.controls import Header, NavBar
@@ -23,22 +23,51 @@ class View(BaseView):
             favorite_ids.append(e.control.data)
             favorite_ids.sort()
         self.app.session.favorite_ids = favorite_ids
-        await self.app.session.save_favorite_ids()
+        await self.save_favorite_ids()
         e.control.selected = not e.control.selected
-        if self.is_navbar and self.navbar.favorite_tab.content.controls[0].selected:
-            await self.params.get('on_navbar_favorite_click')(e)
-        else:
-            await e.control.update_async()
+        await e.control.update_async()
         await self.app.page.update_async()
         print(favorite_ids)
 
+    async def save_favorite_ids(self):
+        favorite_ids = self.app.session.favorite_ids
+        await self.app.page.client_storage.set_async('favorite_ids', favorite_ids)
+
+    async def load_favorite_ids(self):
+        try:
+            favorite_ids = await self.app.page.client_storage.get_async('favorite_ids')
+            if favorite_ids is None:
+                self.app.session.favorite_ids = []
+            else:
+                self.app.session.favorite_ids = favorite_ids
+
+        except NotImplementedError:
+            self.app.session.favorite_ids = []
+            await self.app.page.client_storage.set_async('favorite_ids', self.app.session.favorite_ids)
+
+    async def save_search_queries(self):
+        search_queries = self.app.session.search_queries
+        await self.app.page.client_storage.set_async('search_queries', search_queries)
+
+    async def load_search_queries(self):
+        try:
+            search_queries = await self.app.page.client_storage.get_async('search_queries')
+            if search_queries is None:
+                self.app.session.search_queries = []
+            else:
+                self.app.session.search_queries = search_queries
+        except NotImplementedError:
+            self.app.session.search_queries = []
+            await self.app.page.client_storage.set_async('search_queries', self.app.session.search_queries)
+
     async def create(self):
-        await self.app.session.save_favorite_ids()
+        self.app.page.theme.page_transitions.windows = PageTransitionTheme.CUPERTINO
         self.app.page.fonts = {
             'Bold': r'assets\fonts\Montserrat\Bold.ttf',
             'SemiBold': r'assets\fonts\Montserrat\SemiBold.ttf',
             'Medium': r'assets\fonts\Montserrat\Medium.ttf',
             'Regular': r'assets\fonts\Montserrat\Regular.ttf',
+            'Times New Roman': r'assets\fonts\times-new-roman.ttf'
         }
         self.padding = 0
         self.spacing = 0

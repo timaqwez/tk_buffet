@@ -1,3 +1,6 @@
+from enum import Enum
+
+import flet
 from flet_core import ButtonStyle, ColorScheme, ScrollbarTheme, TextStyle, TextTheme, Theme, colors
 
 
@@ -8,21 +11,22 @@ class WhiteTheme:
     secondary_color_dark: str = colors.GREY_500
     secondary_color_light: str = colors.GREY_200
     is_dark_mode = False
+    is_zhur_mode = False
 
     text_style_small_regular = TextStyle(
         font_family='Regular',
         color=primary_color,
-        size=15
+        size=10
     )
     text_style_medium_regular = TextStyle(
         font_family='Regular',
         color=primary_color,
-        size=25
+        size=17
     )
     text_style_large_regular = TextStyle(
         font_family='Regular',
         color=primary_color,
-        size=35
+        size=22
     )
     text_style_semi_bold = TextStyle(
         font_family='SemiBold',
@@ -66,7 +70,7 @@ class WhiteTheme:
         surface_tint_color=bg_color,
     )
 
-    async def switch_theme(self, e):
+    async def dark_mode_switch(self, e):
         self.is_dark_mode = not self.is_dark_mode
         self.primary_color = 'white' if self.is_dark_mode else 'black'
         self.bg_color = 'black' if self.is_dark_mode else 'white'
@@ -80,3 +84,18 @@ class WhiteTheme:
             surface_tint_color=self.bg_color,
         )
         return self
+
+    async def zhuravskaya_mode_switch(self, e):
+        self.is_zhur_mode = not self.is_zhur_mode
+        if self.is_zhur_mode:
+            self.text_style_small_regular.font_family = 'Times New Roman'
+            self.text_style_medium_regular.font_family = 'Times New Roman'
+            self.text_style_large_regular.font_family = 'Times New Roman'
+            self.text_style_semi_bold.font_family = 'Times New Roman'
+        else:
+            self.text_style_small_regular.font_family = 'Regular'
+            self.text_style_medium_regular.font_family = 'Regular'
+            self.text_style_large_regular.font_family = 'Regular'
+            self.text_style_semi_bold.font_family = 'SemiBold'
+        return self
+

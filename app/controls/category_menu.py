@@ -66,7 +66,6 @@ class CategoryMenu(Container):
         self.padding = padding.only(
             left=20,
             right=20,
-            top=20,
             bottom=20
         )
         self.alignment = alignment.top_left

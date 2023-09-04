@@ -66,7 +66,7 @@ class Header(Container):
         )
         self.logo = Text(
             value=self.text,
-            size=40,
+            size=30,
             no_wrap=True,
             text_align=TextAlign.CENTER,
             color=self.app.theme.primary_color,
@@ -102,13 +102,11 @@ class Header(Container):
             )
             content.controls.append(row)
         else:
-            content.controls.insert(
-                0,
+            content.controls.append(
                 Container(
                     content=self.back_button,
                     alignment=alignment.center_left
                 )
-
             )
         self.content = content
         self.alignment = alignment.center

@@ -1,9 +1,10 @@
 from flet_core import BorderSide, Column, Container, CrossAxisAlignment, IconButton, Image, ImageFit, ImageRepeat, \
-    ListView, MainAxisAlignment, Row, Stack, Text, alignment, border, icons, margin, padding
+    ListView, MainAxisAlignment, Row, Stack, Text, TextThemeStyle, alignment, border, icons, margin, padding
 
 from app.controls import InfoText
 from app.controls import View
 from app.controls.available_container import AvailableContainer
+from config import API_URL
 
 
 class ProductView(View):
@@ -42,12 +43,12 @@ class ProductView(View):
                                         controls=[
                                             Container(
                                                 content=Image(
-                                                    src=f'assets/images/{image_name}',
+                                                    src=API_URL+f'images/{image_name}',
                                                     fit=ImageFit.FIT_WIDTH,
                                                     repeat=ImageRepeat.NO_REPEAT,
                                                     border_radius=10,
-                                                    width=500,
-                                                    height=350
+                                                    height=300,
+                                                    width=500
                                                 ),
                                                 alignment=alignment.center,
                                                 margin=margin.only(
@@ -89,7 +90,7 @@ class ProductView(View):
                                                     content=Text(
                                                         value=name,
                                                         no_wrap=False,
-                                                        size=30,
+                                                        style=TextThemeStyle.BODY_LARGE,
                                                         color=self.app.theme.primary_color
                                                     ),
                                                     alignment=alignment.bottom_left,
@@ -102,7 +103,7 @@ class ProductView(View):
                                                 Container(
                                                     content=Text(
                                                         value=str(price) + ' BYN',
-                                                        size=25,
+                                                        style=TextThemeStyle.BODY_MEDIUM,
                                                         color=self.app.theme.primary_color
                                                     ),
                                                     alignment=alignment.top_left,
@@ -127,7 +128,7 @@ class ProductView(View):
                                             content=Text(
                                                 value=str(weight) + ' г',
                                                 no_wrap=False,
-                                                size=30,
+                                                style=TextThemeStyle.BODY_LARGE,
                                                 color=self.app.theme.secondary_color
                                             ),
                                             alignment=alignment.center_right,
@@ -146,7 +147,7 @@ class ProductView(View):
                                             content=Text(
                                                 value='В 100 граммах',
                                                 no_wrap=False,
-                                                size=30,
+                                                style=TextThemeStyle.BODY_LARGE,
                                                 color=self.app.theme.secondary_color,
                                             ),
                                             alignment=alignment.bottom_left,
@@ -162,13 +163,13 @@ class ProductView(View):
                                                         controls=[
                                                             Text(
                                                                 value=kcal,
-                                                                size=22,
+                                                                style=TextThemeStyle.BODY_LARGE,
                                                                 no_wrap=False,
                                                                 color=self.app.theme.primary_color
                                                             ),
                                                             Text(
                                                                 value='ккал',
-                                                                size=18,
+                                                                style=TextThemeStyle.BODY_MEDIUM,
                                                                 no_wrap=False,
                                                                 color=self.app.theme.primary_color,
                                                             ),
@@ -179,13 +180,13 @@ class ProductView(View):
                                                         controls=[
                                                             Text(
                                                                 value=str(carb)+' г',
-                                                                size=22,
+                                                                style=TextThemeStyle.BODY_LARGE,
                                                                 no_wrap=False,
                                                                 color=self.app.theme.primary_color
                                                             ),
                                                             Text(
                                                                 value='углеводы',
-                                                                size=18,
+                                                                style=TextThemeStyle.BODY_MEDIUM,
                                                                 no_wrap=False,
                                                                 color=self.app.theme.primary_color,
                                                             ),

@@ -1,5 +1,7 @@
 from flet_core import Column, Container, CrossAxisAlignment, IconButton, Image, ImageFit, ImageRepeat, \
-    MainAxisAlignment, Stack, Text, alignment, icons, margin
+    MainAxisAlignment, Stack, Text, TextThemeStyle, alignment, icons, margin
+
+from config import API_URL
 from flet_manager import App
 
 from app.controls.available_container import AvailableContainer
@@ -34,15 +36,14 @@ class ProductCard(Container):
                     controls=[
                         Container(
                             content=Image(
-                                src=f'assets/images/{image_name}',
+                                src=API_URL+f'images/{image_name}',
                                 fit=ImageFit.FIT_WIDTH,
                                 repeat=ImageRepeat.NO_REPEAT,
                                 border_radius=10,
-                                width=500,
                                 height=200,
-
+                                width=500
                             ),
-                            alignment=alignment.center
+                            alignment=alignment.center,
                         ),
                         AvailableContainer(app=self.app, count=count),
                         Container(
@@ -66,16 +67,16 @@ class ProductCard(Container):
                         Container(
                             content=Text(
                                 value=name,
-                                no_wrap=False,
-                                size=25,
-                                color=self.app.theme.primary_color
+                                no_wrap=True,
+                                color=self.app.theme.primary_color,
+                                style=TextThemeStyle.BODY_LARGE,
                             ),
                             alignment=alignment.bottom_left,
                         ),
                         Container(
                             content=Text(
                                 value=str(price) + ' BYN',
-                                size=25,
+                                style=TextThemeStyle.BODY_LARGE,
                                 color=self.app.theme.primary_color
                             ),
                             alignment=alignment.bottom_right,
@@ -96,7 +97,7 @@ class ProductCard(Container):
         self.margin = margin.only(
             left=20,
             right=20,
-            bottom=50
+            bottom=40
         )
         self.height = 200
         self.ink = True

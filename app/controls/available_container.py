@@ -1,5 +1,5 @@
 from flet_core import ButtonStyle, Container, ElevatedButton, Icon, MaterialState, RoundedRectangleBorder, Row, Text, \
-    colors, \
+    TextThemeStyle, colors, \
     icons, \
     padding
 from flet_manager import App
@@ -23,18 +23,17 @@ class AvailableContainer(Container):
                         content=Icon(
                             name=icons.CHECK_CIRCLE_ROUNDED if self.count > 0 else icons.DO_NOT_DISTURB_ON_SHARP,
                             color=self.app.theme.bg_color,
-                            size=25,
                         ),
                     ),
                     Container(
                         content=Text(
                             value='В наличии' if self.count > 15 else 'Мало' if self.count > 0 else 'Закончилось',
                             color=self.app.theme.bg_color,
-                            size=14,
+                            style=TextThemeStyle.BODY_SMALL
                         ),
                         padding=padding.only(
                             right=2
-                        )
+                        ),
                     ),
                 ],
                 spacing=3,

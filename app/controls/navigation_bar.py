@@ -1,7 +1,7 @@
 from flet_core import BoxShadow, Column, Container, CrossAxisAlignment, IconButton, \
     MainAxisAlignment, Row, \
     Text, TextThemeStyle, \
-    icons
+    icons, padding
 from flet_manager import App
 
 
@@ -40,25 +40,27 @@ class NavBar(Container):
                             icon_color=self.app.theme.secondary_color_dark,
                             selected_icon_color=self.app.theme.primary_color,
                             icon_size=40,
-                            height=50,
+                            height=40,
                             selected=True,
                             disabled=True,
                         ),
                         Text(
-                            style=TextThemeStyle.BODY_SMALL,
-                            size=20,
+                            style=TextThemeStyle.BODY_MEDIUM,
                             value='Меню',
                             color=self.app.theme.primary_color
                         )
                     ],
-                    spacing=0,
+                    spacing=5,
                     alignment=MainAxisAlignment.CENTER,
                     horizontal_alignment=CrossAxisAlignment.CENTER,
                 ),
                 bgcolor=self.app.theme.bg_color,
                 expand=True,
                 on_click=self.on_navbar_menu_click,
-                ink=True
+                ink=True,
+                padding=padding.only(
+                    bottom=10
+                )
             )
             self.favorite_tab = Container(
                 content=Column(
@@ -69,24 +71,27 @@ class NavBar(Container):
                             icon_color=self.app.theme.secondary_color_dark,
                             selected_icon_color=self.app.theme.primary_color,
                             icon_size=40,
-                            height=50,
+                            height=40,
                             selected=False,
                             disabled=True
                         ),
                         Text(
-                            style=TextThemeStyle.BODY_SMALL,
-                            size=20,
+                            style=TextThemeStyle.BODY_MEDIUM,
                             value='Избранное',
                             color=self.app.theme.secondary_color_dark
                         )
                     ],
-                    spacing=0,
+                    spacing=5,
                     alignment=MainAxisAlignment.CENTER,
                     horizontal_alignment=CrossAxisAlignment.CENTER,
                 ),
                 bgcolor=self.app.theme.bg_color,
                 expand=True,
                 on_click=self.on_navbar_favorite_click,
+                ink=True,
+                padding=padding.only(
+                    bottom=10
+                )
             )
             self.content = Row(
                 controls=[

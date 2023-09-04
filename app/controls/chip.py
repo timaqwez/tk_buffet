@@ -1,4 +1,5 @@
-from flet_core import ButtonStyle, FilledButton, MaterialState, RoundedRectangleBorder, Text, TextAlign, padding
+from flet_core import ButtonStyle, FilledButton, MaterialState, RoundedRectangleBorder, Text, TextAlign, TextThemeStyle, \
+    padding
 from flet_manager import App
 
 
@@ -18,7 +19,7 @@ class Chip(FilledButton):
         self.create()
 
     def create(self):
-        self.height = 30
+        self.height = 25
         self.style = ButtonStyle(
             shape={MaterialState.DEFAULT: RoundedRectangleBorder(radius=6)},
             padding={MaterialState.DEFAULT: padding.symmetric(horizontal=5)},
@@ -33,9 +34,16 @@ class Chip(FilledButton):
         )
         self.content = Text(
             value=self.text,
-            size=20,
+            style=TextThemeStyle.BODY_MEDIUM,
             text_align=TextAlign.LEFT,
             color=self.app.theme.bg_color if self.is_active else self.app.theme.primary_color
         )
-        self.bgcolor = self.app.theme.secondary_color_dark if self.is_active else self.app.theme.secondary_color
+        if self.app.theme.is_dark_mode and self.is_active:
+            self.bgcolor = self.app.theme.secondary_color
+        elif self.app.theme.is_dark_mode:
+            self.bgcolor = self.app.theme.secondary_color_dark
+        elif not self.app.theme.is_dark_mode and self.is_active:
+            self.bgcolor = self.app.theme.secondary_color_dark
+        elif not self.app.theme.is_dark_mode:
+            self.bgcolor = self.app.theme.secondary_color
 
