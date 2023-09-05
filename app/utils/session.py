@@ -10,6 +10,7 @@ class Session:
     product_extended_info: list[dict]
     categories: list[dict]
     current_products: list[dict]
+
     favorite_ids: list[int]
     search_queries: list[str]
     config: Config

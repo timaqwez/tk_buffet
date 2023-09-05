@@ -16,12 +16,13 @@
 
 
 from ast import literal_eval
+from os.path import abspath
 from urllib.parse import urlparse, parse_qsl
 
 from flet_core import Page, RouteChangeEvent
 from flet_core.types import AppView
-from flet_runtime import app as flet_app
-# from flet_fastapi import app as flet_fastapi_app
+# from flet_runtime import app as flet_app
+from flet_fastapi import app as flet_fastapi_app
 
 from flet_manager.views import ErrorView, BaseView
 
@@ -42,7 +43,7 @@ class App:
             views: list[BaseView] = None,
             theme=None,
             session=None,
-            app_view: AppView = AppView.WEB_BROWSER,
+            app_view: AppView = AppView.FLET_APP_WEB,
             **kwargs
     ):
         if not views:
@@ -59,8 +60,7 @@ class App:
         for view in views:
             self.routes[view.route] = view
 
-        flet_app(self.start, view=app_view, **kwargs)
-        # self.app = flet_fastapi_app(self.start, assets_dir='assets')
+        self.app = flet_fastapi_app(self.start, assets_dir=abspath('assets/'))
 
     async def view_pop(self, view):
         await self.view_change(go_back=True)
