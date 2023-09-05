@@ -23,6 +23,5 @@ def app_start():
         main_view=MainView,
         theme=WhiteTheme(),
         session=Session(),
-        host='192.168.1.106',
         port='53570'
     )
