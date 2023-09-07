@@ -1,7 +1,6 @@
-import flet
 from flet_core import BottomSheet, Checkbox, Column, Container, Row, Text, TextField, TextThemeStyle, alignment, \
     border_radius, \
-    margin, padding
+    margin, padding, Image
 from flet_core import ListView, ResponsiveRow
 from httpx import AsyncClient
 
@@ -203,8 +202,14 @@ class MainView(View):
         await self.update_async()
 
     async def loading(self):
-        self.products.controls[1] = flet.Image(
-            animate_position=10,
+        self.products.controls[1] = Container(
+            content=Image(
+                src=r'assets/icons/loading-animation.svg',
+                width=150,
+                color=self.app.theme.primary_color,
+            ),
+            expand=True,
+            alignment=alignment.center,
         )
         await self.products.update_async()
 

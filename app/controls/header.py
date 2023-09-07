@@ -1,12 +1,12 @@
 from flet_core import BoxShadow, Container, IconButton, MainAxisAlignment, Row, Stack, Text, TextAlign, \
     TransparentPointer, alignment, \
-    icons, padding
+    icons, padding, Image
 from flet_manager import App
 
 
 class Header(Container):
     app: App
-    logo: Text
+    logo: Row
     search_button: IconButton
     menu_button: IconButton
 
@@ -64,12 +64,22 @@ class Header(Container):
             style=self.app.theme.icon_button_style,
             on_click=self.get_back
         )
-        self.logo = Text(
-            value=self.text,
-            size=30,
-            no_wrap=True,
-            text_align=TextAlign.CENTER,
-            color=self.app.theme.primary_color,
+        self.logo = Row(
+            controls=[
+                Image(
+                    src=r'assets/icons/loading-animation.svg',
+                    width=50,
+                    color=self.app.theme.primary_color
+                ),
+                Text(
+                    value=self.text,
+                    size=30,
+                    no_wrap=True,
+                    text_align=TextAlign.CENTER,
+                    color=self.app.theme.primary_color,
+                ),
+            ],
+            wrap=True
         )
 
         self.height = 70

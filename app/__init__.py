@@ -7,7 +7,7 @@ from app.views import MainView
 
 
 def app_start():
-    fastapi_app = App(
+    App(
         title='Буфет',
         views=views,
         assets_dir='assets',
@@ -16,4 +16,13 @@ def app_start():
         session=Session(),
         port='53570'
     )
-    return fastapi_app.app
+    # fastapi_app = App(
+    #     title='Буфет',
+    #     views=views,
+    #     assets_dir='assets',
+    #     main_view=MainView,
+    #     theme=WhiteTheme(),
+    #     session=Session(),
+    #     port='53570'
+    # )
+    # return fastapi_app.app
