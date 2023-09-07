@@ -1,3 +1,5 @@
+from starlette.staticfiles import StaticFiles
+
 from flet_manager import App
 
 from app.utils.session import Session
@@ -16,4 +18,5 @@ def app_start():
         session=Session(),
         port='53570'
     )
+    fastapi_app.app.mount('/static', StaticFiles(directory='assets'), name='static')
     return fastapi_app.app
