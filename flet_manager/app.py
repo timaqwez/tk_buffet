@@ -24,6 +24,7 @@ from flet_core.types import AppView
 from flet_runtime import app as flet_app
 # from flet_fastapi import app as flet_fastapi_app
 
+
 from flet_manager.views import ErrorView, BaseView
 
 

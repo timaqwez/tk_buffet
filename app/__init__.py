@@ -1,3 +1,5 @@
+from starlette.staticfiles import StaticFiles
+
 from flet_manager import App
 
 from app.utils.session import Session
