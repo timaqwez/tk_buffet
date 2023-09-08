@@ -220,8 +220,9 @@ class MainView(View):
                 height=200,
             ),
             animate_opacity=600,
-            animate_scale=300,
-            opacity=0,
+            animate_scale=800,
+            opacity=1,
+            scale=1
         )
         self.products.controls[1] = Container(
             content=Stack(
@@ -232,9 +233,9 @@ class MainView(View):
             ),
             alignment=alignment.center
         )
-        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
         await self.products.update_async()
-        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0.5 else 0.5
+        pizza_piece.scale = 1 if pizza_piece.scale == 0.7 else 0.7
         await self.products.update_async()
 
     async def build(self):

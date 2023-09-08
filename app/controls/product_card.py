@@ -41,7 +41,7 @@ class ProductCard(Container):
                                 repeat=ImageRepeat.NO_REPEAT,
                                 border_radius=10,
                                 height=200,
-                                width=500
+                                width=500,
                             ),
                             alignment=alignment.center,
                         ),

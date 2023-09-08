@@ -20,10 +20,10 @@ from os.path import abspath
 from urllib.parse import urlparse, parse_qsl
 
 from flet_core import Page, RouteChangeEvent
-from flet_core.types import AppView
+from flet_core.types import AppView, WebRenderer
 from flet_runtime import app as flet_app
 # from flet_fastapi import app as flet_fastapi_app
-
+# from starlette.staticfiles import StaticFiles
 
 from flet_manager.views import ErrorView, BaseView
 
@@ -62,6 +62,7 @@ class App:
             self.routes[view.route] = view
 
         # self.app = flet_fastapi_app(self.start, assets_dir=abspath('assets/'))
+        # self.app.mount('/static', StaticFiles(directory='assets'), name='static')
         self.app = flet_app(self.start, assets_dir='assets')
 
     async def view_pop(self, view):

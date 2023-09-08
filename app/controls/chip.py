@@ -46,4 +46,3 @@ class Chip(FilledButton):
             self.bgcolor = self.app.theme.secondary_color_dark
         elif not self.app.theme.is_dark_mode:
             self.bgcolor = self.app.theme.secondary_color
-
