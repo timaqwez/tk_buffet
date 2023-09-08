@@ -73,10 +73,10 @@ class Header(Container):
                 ),
                 Text(
                     value=self.text,
-                    size=30,
                     no_wrap=True,
                     text_align=TextAlign.CENTER,
                     color=self.app.theme.primary_color,
+                    size=40 if self.app.page.window_width > 1000 else 20
                 ),
             ],
             wrap=True

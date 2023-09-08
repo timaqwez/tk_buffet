@@ -1,6 +1,9 @@
+from asyncio import sleep
+
+import flet
 from flet_core import BottomSheet, Checkbox, Column, Container, Row, Text, TextField, TextThemeStyle, alignment, \
     border_radius, \
-    margin, padding, Image
+    margin, padding, Image, Stack
 from flet_core import ListView, ResponsiveRow
 from httpx import AsyncClient
 
@@ -69,11 +72,6 @@ class MainView(View):
             await self.reset_category(e)
             await self.update_products(e)
             return
-        await self.loading()
-        async with AsyncClient(base_url=API_URL) as client:
-            response = await client.get(f'products/{e.control.category_id}')
-            category_products = response.json()['values']
-        self.app.session.current_products = [product for product in category_products]
         self.products.controls[0] = CategoryMenu(
             app=self.app,
             categories=self.app.session.categories,
@@ -82,6 +80,11 @@ class MainView(View):
             on_category_button_click=self.select_category,
             on_close_button_click=self.reset_category,
         )
+        await self.loading()
+        async with AsyncClient(base_url=API_URL) as client:
+            response = await client.get(f'products/{e.control.category_id}')
+            category_products = response.json()['values']
+        self.app.session.current_products = [product for product in category_products]
         await self.update_products(e)
 
     async def update_products(self, e):
@@ -202,15 +205,36 @@ class MainView(View):
         await self.update_async()
 
     async def loading(self):
-        self.products.controls[1] = Container(
+        pizza = Container(
             content=Image(
-                src=r'assets/icons/loading-animation.svg',
-                width=150,
+                src=r'assets/icons/pizza_no_piece.svg',
                 color=self.app.theme.primary_color,
+                animate_rotation=300,
+                height=200,
             ),
-            expand=True,
-            alignment=alignment.center,
         )
+        pizza_piece = Container(
+            content=Image(
+                src=r'assets/icons/pizza_piece.svg',
+                color=self.app.theme.primary_color,
+                height=200,
+            ),
+            animate_opacity=600,
+            animate_scale=300,
+            opacity=0,
+        )
+        self.products.controls[1] = Container(
+            content=Stack(
+                controls=[
+                    pizza,
+                    pizza_piece
+                ],
+            ),
+            alignment=alignment.center
+        )
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
+        await self.products.update_async()
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
         await self.products.update_async()
 
     async def build(self):
