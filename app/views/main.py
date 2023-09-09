@@ -234,8 +234,11 @@ class MainView(View):
             alignment=alignment.center
         )
         await self.products.update_async()
-        pizza_piece.opacity = 1 if pizza_piece.opacity == 0.5 else 0.5
-        pizza_piece.scale = 1 if pizza_piece.scale == 0.7 else 0.7
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
+        await self.products.update_async()
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
+        await self.products.update_async()
+        pizza_piece.opacity = 1 if pizza_piece.opacity == 0 else 0
         await self.products.update_async()
 
     async def build(self):
