@@ -20,7 +20,7 @@ class ProductView(View):
     async def build(self):
         self.favorite_ids = self.params.get('favorite_ids')
         self.product_id = self.params.get('product_id')
-        self.product = self.app.session.products_extended_info[self.product_id-1]
+        self.product = self.client.page.session.get('products_extended_info')[self.product_id-1]
         name = self.product['name']
         price = self.product['price']
         description = self.product['description']
@@ -56,14 +56,14 @@ class ProductView(View):
                                                     right=20,
                                                 ),
                                             ),
-                                            AvailableContainer(app=self.app, count=available_count),
+                                            AvailableContainer(client=self.client, count=available_count),
                                             Container(
                                                 content=IconButton(
                                                     icon=icons.FAVORITE_OUTLINE_SHARP,
                                                     selected_icon=icons.FAVORITE_OUTLINED,
-                                                    selected=self.product_id in self.app.session.favorite_ids,
-                                                    icon_color=self.app.theme.secondary_color_dark,
-                                                    selected_icon_color=self.app.theme.secondary_color_dark,
+                                                    selected=self.product_id in self.client.page.session.get('favorite_ids'),
+                                                    icon_color=self.client.theme.secondary_color_dark,
+                                                    selected_icon_color=self.client.theme.secondary_color_dark,
                                                     on_click=self.favorite_button_click,
                                                     icon_size=40,
                                                     data=self.product_id
@@ -73,7 +73,7 @@ class ProductView(View):
                                             ),
                                         ],
                                     ),
-                                    bgcolor=self.app.theme.secondary_color,
+                                    bgcolor=self.client.theme.secondary_color,
                                     border_radius=10,
                                     margin=margin.only(
                                         left=20,
@@ -91,7 +91,7 @@ class ProductView(View):
                                                         value=name,
                                                         no_wrap=False,
                                                         style=TextThemeStyle.BODY_LARGE,
-                                                        color=self.app.theme.primary_color
+                                                        color=self.client.theme.primary_color
                                                     ),
                                                     alignment=alignment.bottom_left,
                                                     height=40,
@@ -104,13 +104,13 @@ class ProductView(View):
                                                     content=Text(
                                                         value=str(price) + ' BYN',
                                                         style=TextThemeStyle.BODY_MEDIUM,
-                                                        color=self.app.theme.primary_color
+                                                        color=self.client.theme.primary_color
                                                     ),
                                                     alignment=alignment.top_left,
                                                     border=border.only(
                                                         bottom=BorderSide(
                                                             width=1,
-                                                            color=self.app.theme.secondary_color
+                                                            color=self.client.theme.secondary_color
                                                         )
                                                     ),
                                                     margin=margin.only(
@@ -129,7 +129,7 @@ class ProductView(View):
                                                 value=str(weight) + ' г',
                                                 no_wrap=False,
                                                 style=TextThemeStyle.BODY_LARGE,
-                                                color=self.app.theme.secondary_color
+                                                color=self.client.theme.secondary_color
                                             ),
                                             alignment=alignment.center_right,
                                             height=40,
@@ -140,7 +140,7 @@ class ProductView(View):
                                         ),
                                     ]
                                 ),
-                                InfoText(self.app, 'Описание', description),
+                                InfoText(self.client, 'Описание', description),
                                 Column(
                                     controls=[
                                         Container(
@@ -148,7 +148,7 @@ class ProductView(View):
                                                 value='В 100 граммах',
                                                 no_wrap=False,
                                                 style=TextThemeStyle.BODY_LARGE,
-                                                color=self.app.theme.secondary_color,
+                                                color=self.client.theme.secondary_color,
                                             ),
                                             alignment=alignment.bottom_left,
                                             margin=margin.only(
@@ -165,13 +165,13 @@ class ProductView(View):
                                                                 value=kcal,
                                                                 style=TextThemeStyle.BODY_LARGE,
                                                                 no_wrap=False,
-                                                                color=self.app.theme.primary_color
+                                                                color=self.client.theme.primary_color
                                                             ),
                                                             Text(
                                                                 value='ккал',
                                                                 style=TextThemeStyle.BODY_MEDIUM,
                                                                 no_wrap=False,
-                                                                color=self.app.theme.primary_color,
+                                                                color=self.client.theme.primary_color,
                                                             ),
                                                         ],
                                                         spacing=0
@@ -182,13 +182,13 @@ class ProductView(View):
                                                                 value=str(carb)+' г',
                                                                 style=TextThemeStyle.BODY_LARGE,
                                                                 no_wrap=False,
-                                                                color=self.app.theme.primary_color
+                                                                color=self.client.theme.primary_color
                                                             ),
                                                             Text(
                                                                 value='углеводы',
                                                                 style=TextThemeStyle.BODY_MEDIUM,
                                                                 no_wrap=False,
-                                                                color=self.app.theme.primary_color,
+                                                                color=self.client.theme.primary_color,
                                                             ),
                                                         ],
                                                         spacing=0
@@ -201,7 +201,7 @@ class ProductView(View):
                                             border=border.only(
                                                 bottom=BorderSide(
                                                     width=1,
-                                                    color=self.app.theme.secondary_color
+                                                    color=self.client.theme.secondary_color
                                                 )
                                             ),
                                             padding=padding.only(
@@ -215,9 +215,9 @@ class ProductView(View):
                                     ],
                                     spacing=0,
                                 ),
-                                InfoText(self.app, 'Состав', composition),
-                                InfoText(self.app, 'Срок годности', str(expiration_date) + ' ч'),
-                                InfoText(self.app, 'Производитель', manufacturer),
+                                InfoText(self.client, 'Состав', composition),
+                                InfoText(self.client, 'Срок годности', str(expiration_date) + ' ч'),
+                                InfoText(self.client, 'Производитель', manufacturer),
 
                             ],
                             vertical_alignment=CrossAxisAlignment.START,

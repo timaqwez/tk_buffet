@@ -2,20 +2,21 @@ from starlette.staticfiles import StaticFiles
 
 from flet_manager import App
 
-from app.utils.session import Session
 from app.views import views
 from app.utils.themes import WhiteTheme
 from app.views import MainView
+from flet_manager.app import AppType
 
 
 def app_start():
-    fastapi_app = App(
-        title='Буфет',
+    app_type = AppType.FLET
+    app = App(
         views=views,
         assets_dir='assets',
-        main_view=MainView,
+        view_main=MainView,
         theme=WhiteTheme(),
-        session=Session(),
-        port='53570'
+        port=53570,
+        app_type=app_type
     )
-    # return fastapi_app.app
+    if app_type == AppType.FASTAPI:
+        return app.fastapi

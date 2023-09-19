@@ -3,6 +3,7 @@ from flet_core import ButtonStyle, Container, ElevatedButton, Icon, MaterialStat
     icons, padding
 from flet_manager import App
 from app.controls.chip import Chip
+from flet_manager.controls import Client
 
 
 class CategoryMenu(Container):
@@ -10,20 +11,20 @@ class CategoryMenu(Container):
     is_active: bool
     active_id: int
     close_button: ElevatedButton
-    app: App
+    client: Client
 
     def __init__(self,
                  on_category_button_click,
                  on_close_button_click,
                  categories: list,
-                 app: App,
+                 client: Client,
                  is_active: bool,
                  active_id: int = 0,
                  **kwargs):
         super().__init__(
             **kwargs
         )
-        self.app = app
+        self.client = client
         self.categories = categories
         self.is_active = is_active
         self.active_id = active_id
@@ -36,16 +37,16 @@ class CategoryMenu(Container):
             style=ButtonStyle(
                 padding={MaterialState.DEFAULT: padding.symmetric(horizontal=0)},
                 overlay_color={
-                    MaterialState.DEFAULT: self.app.theme.secondary_color,
+                    MaterialState.DEFAULT: self.client.theme.secondary_color,
                 },
                 bgcolor={
-                    MaterialState.DEFAULT: self.app.theme.secondary_color
+                    MaterialState.DEFAULT: self.client.theme.secondary_color
                 }
 
             ),
             content=Icon(
                 name=icons.CLOSE_OUTLINED,
-                color=self.app.theme.primary_color,
+                color=self.client.theme.primary_color,
                 size=25,
             ),
             height=25,
@@ -54,7 +55,7 @@ class CategoryMenu(Container):
         )
         self.content = Row(
             controls=[
-                Chip(app=self.app,
+                Chip(client=self.client,
                      text=category['name'].capitalize(),
                      is_active=True if category['id'] == self.active_id else False,
                      category_id=category['id'],

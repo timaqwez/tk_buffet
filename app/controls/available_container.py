@@ -3,14 +3,15 @@ from flet_core import ButtonStyle, Container, ElevatedButton, Icon, MaterialStat
     icons, \
     padding
 from flet_manager import App
+from flet_manager.controls import Client
 
 
 class AvailableContainer(Container):
-    app: App
+    client: Client
     count: int
 
-    def __init__(self, app: App, count: int):
-        self.app = app
+    def __init__(self, client: Client, count: int):
+        self.client = client
         self.count = count
         super().__init__()
         self.create()
@@ -22,13 +23,13 @@ class AvailableContainer(Container):
                     Container(
                         content=Icon(
                             name=icons.CHECK_CIRCLE_ROUNDED if self.count > 0 else icons.DO_NOT_DISTURB_ON_SHARP,
-                            color=self.app.theme.bg_color,
+                            color=self.client.theme.bg_color,
                         ),
                     ),
                     Container(
                         content=Text(
                             value='В наличии' if self.count > 15 else 'Мало' if self.count > 0 else 'Закончилось',
-                            color=self.app.theme.bg_color,
+                            color=self.client.theme.bg_color,
                             style=TextThemeStyle.BODY_SMALL
                         ),
                         padding=padding.only(
@@ -54,7 +55,7 @@ class AvailableContainer(Container):
                         else colors.RED_400,
                 },
                 overlay_color={
-                    MaterialState.HOVERED: self.app.theme.secondary_color_light},
+                    MaterialState.HOVERED: self.client.theme.secondary_color_light},
             ),
         )
         self.padding = 10

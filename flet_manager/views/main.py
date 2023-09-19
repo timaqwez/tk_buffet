@@ -15,31 +15,21 @@
 #
 
 
-from flet_core import Text, Row, IconButton, icons
+from flet_core import Text, Container, alignment
 
 from flet_manager.views.base import BaseView
 
 
-class ErrorView(BaseView):
-    route: str = '/error'
-
-    async def go_back(self, e):
-        await self.page.change_view(go_back=True)
+class MainView(BaseView):
+    title = 'Main'
 
     async def build(self):
         self.controls = [
-            Row(
-                controls=[
-                    IconButton(
-                        icon=icons.ARROW_BACK,
-                        icon_size=48,
-                        tooltip='Go back',
-                        on_click=self.go_back,
-                    ),
-                    Text(
-                        value=self.params.get('error_code'),
-                        size=48,
-                    ),
-                ],
+            Container(
+                content=Text(
+                    value='Hello, world!',
+                    size=48,
+                ),
+                alignment=alignment.center,
             ),
         ]

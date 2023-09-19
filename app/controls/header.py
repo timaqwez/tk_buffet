@@ -2,16 +2,17 @@ from flet_core import BoxShadow, Container, IconButton, MainAxisAlignment, Row, 
     TransparentPointer, alignment, \
     icons, padding, Image
 from flet_manager import App
+from flet_manager.controls import Client
 
 
 class Header(Container):
-    app: App
+    client: Client
     logo: Row
     search_button: IconButton
     menu_button: IconButton
 
     def __init__(self,
-                 app: App,
+                 client: Client,
                  text: str,
                  on_search_click,
                  on_menu_click,
@@ -23,7 +24,7 @@ class Header(Container):
             **kwargs
         )
         self.back_button = None
-        self.app = app
+        self.client = client
         self.on_search_click = on_search_click
         self.on_menu_click = on_menu_click
         self.on_logo_click = on_logo_click
@@ -33,7 +34,7 @@ class Header(Container):
         self.create()
 
     async def get_back(self, e):
-        await self.app.view_change(
+        await self.client.view_change(
             go_back=True,
         )
         await self.update_products(e)
@@ -41,49 +42,49 @@ class Header(Container):
     def create(self):
         self.search_button = IconButton(
             icon=icons.SEARCH_OUTLINED,
-            icon_color=self.app.theme.primary_color,
+            icon_color=self.client.theme.primary_color,
             selected_icon=icons.CLOSE_OUTLINED,
-            selected_icon_color=self.app.theme.primary_color,
+            selected_icon_color=self.client.theme.primary_color,
             selected=False,
             icon_size=40,
-            style=self.app.theme.icon_button_style,
+            style=self.client.theme.icon_button_style,
             on_click=self.on_search_click,
         )
         self.menu_button = IconButton(
             icon=icons.MENU,
-            icon_color=self.app.theme.primary_color,
+            icon_color=self.client.theme.primary_color,
             selected=False,
             icon_size=40,
-            style=self.app.theme.icon_button_style,
+            style=self.client.theme.icon_button_style,
             on_click=self.on_menu_click
         )
         self.back_button = IconButton(
             icon=icons.ARROW_BACK_IOS_ROUNDED,
-            icon_color=self.app.theme.primary_color,
+            icon_color=self.client.theme.primary_color,
             icon_size=30,
-            style=self.app.theme.icon_button_style,
+            style=self.client.theme.icon_button_style,
             on_click=self.get_back
         )
         self.logo = Row(
             controls=[
                 Image(
-                    src=r'assets/icons/loading-animation.svg',
+                    src=r'assets/icons/loading_animation.svg',
                     width=50,
-                    color=self.app.theme.primary_color
+                    color=self.client.theme.primary_color
                 ),
                 Text(
                     value=self.text,
                     no_wrap=True,
                     text_align=TextAlign.CENTER,
-                    color=self.app.theme.primary_color,
-                    size=40 if self.app.page.window_width > 1000 else 20
+                    color=self.client.theme.primary_color,
+                    size=40 if self.client.page.window_width > 1000 else 20
                 ),
             ],
             wrap=True
         )
 
         self.height = 70
-        self.bgcolor = self.app.theme.bg_color
+        self.bgcolor = self.client.theme.bg_color
         content = Stack(
             controls=[
                 TransparentPointer(
@@ -125,7 +126,7 @@ class Header(Container):
             right=9
         )
         self.shadow = BoxShadow(
-            color=self.app.theme.bg_color if self.app.theme.is_dark_mode else self.app.theme.secondary_color,
+            color=self.client.theme.bg_color if self.client.theme.is_dark_mode else self.client.theme.secondary_color,
             spread_radius=3,
             blur_radius=10
         )

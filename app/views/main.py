@@ -40,7 +40,7 @@ class MainView(View):
         await self.bottom_sheet.update_async()
 
     async def open_product_view(self, e):
-        await self.app.view_change(
+        await self.client.view_change(
             view=ProductView(
                 product_id=e.control.product_id,
                 update_products=self.update_products
@@ -48,7 +48,7 @@ class MainView(View):
         )
 
     async def open_search_view(self, e):
-        await self.app.view_change(
+        await self.client.view_change(
             view=SearchView(
                 main_view=self,
                 on_search_submit=self.on_search_submit
@@ -57,13 +57,13 @@ class MainView(View):
 
     async def reset_category(self, e):
         self.products.controls[0] = CategoryMenu(
-            app=self.app,
-            categories=self.app.session.categories,
+            client=self.client,
+            categories=self.client.page.session.get('categories'),
             is_active=False,
             on_category_button_click=self.select_category,
             on_close_button_click=self.reset_category,
         )
-        self.app.session.current_products = self.app.session.products_extended_info
+        self.client.page.session.set('current_products', self.client.page.session.get('products_extended_info'))
         await self.update_products(e)
         await self.update_async()
 
@@ -73,8 +73,8 @@ class MainView(View):
             await self.update_products(e)
             return
         self.products.controls[0] = CategoryMenu(
-            app=self.app,
-            categories=self.app.session.categories,
+            client=self.client,
+            categories=self.client.page.session.get('categories'),
             is_active=True,
             active_id=e.control.category_id,
             on_category_button_click=self.select_category,
@@ -84,19 +84,19 @@ class MainView(View):
         async with AsyncClient(base_url=API_URL) as client:
             response = await client.get(f'products/{e.control.category_id}')
             category_products = response.json()['values']
-        self.app.session.current_products = [product for product in category_products]
+        self.client.page.session.set('current_products', [product for product in category_products])
         await self.update_products(e)
 
     async def update_products(self, e):
         self.products.controls[1] = ResponsiveRow(
             controls=[
                 ProductCard(
-                    app=self.app,
+                    client=self.client,
                     product=product,
                     on_click=self.open_product_view,
                     on_favorite_button_click=self.favorite_button_click,
-                    is_favorite=product['id'] in self.app.session.favorite_ids
-                ) for product in self.app.session.current_products
+                    is_favorite=product['id'] in self.client.page.session.get('favorite_ids')
+                ) for product in self.client.page.session.get('current_products')
             ],
             columns=3,
         )
@@ -104,74 +104,80 @@ class MainView(View):
 
     async def on_navbar_menu_click(self, e):
         self.products.controls[0] = CategoryMenu(
-            app=self.app,
+            client=self.client,
             is_active=False,
-            categories=self.app.session.categories,
+            categories=self.client.page.session.get('categories'),
             on_category_button_click=self.select_category,
             on_close_button_click=self.reset_category,
         )
         self.navbar.menu_tab.content.controls[0].selected = True
         self.navbar.favorite_tab.content.controls[0].selected = False
-        self.navbar.menu_tab.content.controls[1].color = self.app.theme.primary_color
-        self.navbar.favorite_tab.content.controls[1].color = self.app.theme.secondary_color_dark
-        self.app.session.current_products = self.app.session.products_extended_info
+        self.navbar.menu_tab.content.controls[1].color = self.client.theme.primary_color
+        self.navbar.favorite_tab.content.controls[1].color = self.client.theme.secondary_color_dark
+        self.client.page.session.set('current_products', self.client.page.session.get('products_extended_info'))
         await self.update_products(e)
 
     async def on_navbar_favorite_click(self, e):
-        favorite_ids = self.app.session.favorite_ids
+        favorite_ids = self.client.page.session.get('favorite_ids')
         self.navbar.menu_tab.content.controls[0].selected = False
         self.navbar.favorite_tab.content.controls[0].selected = True
-        self.navbar.menu_tab.content.controls[1].color = self.app.theme.secondary_color_dark
-        self.navbar.favorite_tab.content.controls[1].color = self.app.theme.primary_color
+        self.navbar.menu_tab.content.controls[1].color = self.client.theme.secondary_color_dark
+        self.navbar.favorite_tab.content.controls[1].color = self.client.theme.primary_color
         if not favorite_ids:
             self.products.controls[0] = Container(height=0)
             self.products.controls[1] = Container(
                 content=Text(
                     value='У вас нет избранного',
                     style=TextThemeStyle.BODY_LARGE,
-                    color=self.app.theme.secondary_color_dark
+                    color=self.client.theme.secondary_color_dark
                 ),
                 alignment=alignment.center
             )
             await self.update_async()
             return
         self.products.controls[0] = Container(height=0)
-        self.app.session.current_products = [
-            product for product in self.app.session.products_extended_info if product['id'] in favorite_ids
-        ]
+        self.client.page.session.set(
+            'current_products',
+            [product for product in self.client.page.session.get('products_extended_info') if product['id'] in favorite_ids]
+        )
         await self.update_products(e)
 
     async def zhuravskaya_mode_change(self, e):
-        self.app.theme = await self.app.theme.zhuravskaya_mode_switch(e)
+        self.client.theme = await self.client.theme.zhuravskaya_mode_switch(e)
         await self.bottom_sheet.update_async()
         await self.restart()
-        await self.app.page.update_async()
+        await self.client.page.update_async()
 
     async def dark_mode_change(self, e):
-        self.app.theme = await self.app.theme.dark_mode_switch(e)
+        self.client.theme = await self.client.theme.dark_mode_switch(e)
         self.bottom_sheet.open = False
+        await self.bottom_sheet.update_async()
         await self.restart()
-        await self.app.page.update_async()
+        await self.client.page.update_async()
 
     async def on_search_submit(self, e):
         self.products.controls[0] = Container(
             height=0
         )
         query = e.control.value if type(e.control) == TextField else e.control.data
-        await self.app.view_change(
+        await self.client.view_change(
             go_back=True,
         )
-        products = self.app.session.products_extended_info
-        self.app.session.current_products = [
-            product for product in products if query.lower() in product['name'].lower()
-        ]
+        products = self.client.page.session.get('products_extended_info')
+        self.client.page.session.set(
+            'current_products',
+            [product for product in products if query.lower() in product['name'].lower()]
+        )
         await self.update_products(e)
-        if query not in self.app.session.search_queries:
-            self.app.session.search_queries.append(query)
-        if len(self.app.session.search_queries) > 10:
-            queries = self.app.session.search_queries.copy()
+        queries = self.client.page.session.get('search_queries')
+        if query not in queries:
+            queries.append(query)
+        else:
+            queries.remove(query)
+            queries.append(query)
+        if len(queries) > 10:
             queries.pop(0)
-            self.app.session.search_queries = queries
+        self.client.page.session.set('search_queries', queries)
         if len(self.products.controls[1].controls) == 0:
             self.products.controls[1].controls.insert(
                 0,
@@ -179,7 +185,7 @@ class MainView(View):
                     content=Text(
                         value='Ничего не найдено',
                         style=TextThemeStyle.BODY_LARGE,
-                        color=self.app.theme.secondary_color_dark,
+                        color=self.client.theme.secondary_color_dark,
                     ),
                     margin=margin.only(
                         left=20,
@@ -193,7 +199,7 @@ class MainView(View):
                 content=Text(
                     value='Результаты по запросу ' + f'"{query}":',
                     style=TextThemeStyle.BODY_LARGE,
-                    color=self.app.theme.secondary_color_dark,
+                    color=self.client.theme.secondary_color_dark,
                 ),
                 margin=margin.only(
                     left=20,
@@ -208,7 +214,7 @@ class MainView(View):
         pizza = Container(
             content=Image(
                 src=r'assets/icons/pizza_no_piece.svg',
-                color=self.app.theme.primary_color,
+                color=self.client.theme.primary_color,
                 animate_rotation=300,
                 height=200,
             ),
@@ -216,7 +222,7 @@ class MainView(View):
         pizza_piece = Container(
             content=Image(
                 src=r'assets/icons/pizza_piece.svg',
-                color=self.app.theme.primary_color,
+                color=self.client.theme.primary_color,
                 height=200,
             ),
             animate_opacity=600,
@@ -242,25 +248,26 @@ class MainView(View):
         await self.products.update_async()
 
     async def build(self):
+        await self.update_info()
         await self.load_search_queries()
         await self.load_favorite_ids()
         self.products = ListView(
             controls=[
-                CategoryMenu(app=self.app,
+                CategoryMenu(client=self.client,
                              is_active=False,
-                             categories=self.app.session.categories,
                              on_category_button_click=self.select_category,
                              on_close_button_click=self.reset_category,
+                             categories=self.client.page.session.get('categories'),
                              ),
                 ResponsiveRow(
                     controls=[
                         ProductCard(
-                            app=self.app,
+                            client=self.client,
                             product=product,
                             on_click=self.open_product_view,
                             on_favorite_button_click=self.favorite_button_click,
-                            is_favorite=product['id'] in self.app.session.favorite_ids
-                        ) for product in self.app.session.products_extended_info
+                            is_favorite=product['id'] in self.client.page.session.get('favorite_ids'),
+                        ) for product in self.client.page.session.get('products_extended_info')
                     ],
                     columns=3,
                 ),
@@ -270,7 +277,6 @@ class MainView(View):
                 top=20,
             )
         )
-
         self.bottom_sheet = BottomSheet(
             Container(
                 Column(
@@ -281,10 +287,10 @@ class MainView(View):
                                     Text(
                                         value='Режим Журавской',
                                         style=TextThemeStyle.BODY_LARGE,
-                                        color=self.app.theme.primary_color
+                                        color=self.client.theme.primary_color
                                     ),
                                     Checkbox(
-                                        value=self.app.theme.is_zhur_mode,
+                                        value=self.client.theme.is_zhur_mode,
                                         on_change=self.zhuravskaya_mode_change,
                                     )
                                 ]
@@ -297,10 +303,10 @@ class MainView(View):
                                     Text(
                                         value='Темная Тема',
                                         style=TextThemeStyle.BODY_LARGE,
-                                        color=self.app.theme.primary_color
+                                        color=self.client.theme.primary_color
                                     ),
                                     Checkbox(
-                                        value=self.app.theme.is_dark_mode,
+                                        value=self.client.theme.is_dark_mode,
                                         on_change=self.dark_mode_change,
                                     )
                                 ]
@@ -311,14 +317,14 @@ class MainView(View):
                     tight=True,
                 ),
                 padding=30,
-                bgcolor=self.app.theme.bg_color,
+                bgcolor=self.client.theme.bg_color,
                 border_radius=border_radius.only(
                     top_left=15,
                     top_right=15
                 ),
             ),
         )
-        self.app.page.overlay.append(self.bottom_sheet)
+        self.client.page.overlay.append(self.bottom_sheet)
         self.controls = [
             self.products,
         ]

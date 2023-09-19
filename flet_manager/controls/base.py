@@ -19,9 +19,11 @@ from inspect import getfullargspec
 
 from flet_core import Text, View
 
+from flet_manager.controls import Client
+
 
 class BaseControl(View):
-    app: None
+    client: Client
 
     def __init__(self, **kwargs):
         self.params = {}

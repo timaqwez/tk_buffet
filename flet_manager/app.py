@@ -13,112 +13,56 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from typing import Any
+
+from flet_core import Page
+from flet_runtime import app as app_flet
+from flet_fastapi import app as app_fastapi
+
+from flet_manager.controls import Client
+from flet_manager.views import MainView, ErrorView
 
 
-from ast import literal_eval
-from os.path import abspath
-from urllib.parse import urlparse, parse_qsl
-
-from flet_core import Page, RouteChangeEvent
-from flet_core.types import AppView, WebRenderer
-from flet_runtime import app as flet_app
-# from flet_fastapi import app as flet_fastapi_app
-# from starlette.staticfiles import StaticFiles
-
-from flet_manager.views import ErrorView, BaseView
+class AppType:
+    FLET = 'flet'
+    FASTAPI = 'fastapi'
 
 
 class App:
-    title: str
-    page: Page
-    routes: dict
-    theme: None
-    session: None
-    app: None
+    routes: dict[str]
 
     def __init__(
             self,
-            title: str,
-            main_view: type,
-            error_view: type = ErrorView,
-            views: list[BaseView] = None,
-            theme=None,
-            session=None,
-            app_view: AppView = AppView.FLET_APP_WEB,
-            **kwargs
+            theme: Any,
+            app_type: AppType = AppType.FASTAPI,
+            view_main=MainView,
+            view_error=ErrorView,
+            views: list = None,
+            **kwargs,
     ):
+        self.view_main = view_main
+        self.view_error = view_error
+        self.theme = theme
+
         if not views:
             views = []
-
-        self.title = title
-        self.main_view_class = main_view
-        self.main_view = None
-        self.error_view = error_view
-        self.theme = theme
-        self.session = session
         self.routes = {}
-
         for view in views:
             self.routes[view.route] = view
 
-        # self.app = flet_fastapi_app(self.start, assets_dir=abspath('assets/'))
-        # self.app.mount('/static', StaticFiles(directory='assets'), name='static')
-        self.app = flet_app(self.start, assets_dir='assets')
-
-    async def view_pop(self, view):
-        await self.view_change(go_back=True)
-
-    async def view_change(self, view: BaseView = None, go_back: bool = False):
-        if not self.page.views:
-            view = self.main_view
-
-        if go_back:
-            self.page.views.pop()
-        elif view:
-            view.app = self
-            await view.build()
-            self.page.views.append(await view.get())
-
-        await self.page.go_async(self.page.views[-1].route)
-        await self.page.update_async()
-
-    async def route_change(self, e: RouteChangeEvent):
-        url = urlparse(e.route)
-        route = url.path
-        params = {}
-
-        # Set params for view
-        for key, value in dict(parse_qsl(url.query)).items():
-            try:
-                value = literal_eval(str(value))
-            except ValueError:
-                pass
-            params[key] = value
-        if self.page.views[-1].route == e.route:
-            return
-
-        # Go back if current == -2 view
-        try:
-            if self.page.views[-2].route == e.route:
-                return await self.view_change(go_back=True)
-        except IndexError:
-            pass
-
-        try:
-            view = self.routes[route]
-        except KeyError:
-            view = self.error_view
-            params['error_code'] = 404
-        await self.view_change(view=view(**params))
+        if app_type == AppType.FASTAPI:
+            self.fastapi = app_fastapi(session_handler=self.start, **kwargs)
+        elif app_type == AppType.FLET:
+            app_flet(target=self.start, **kwargs)
 
     async def start(self, page: Page):
-        self.page = page
-        self.page.theme = self.theme.app_theme
-        self.page.on_view_pop = self.view_pop
-        self.page.on_route_change = self.route_change
-
-        self.page.title = self.title
-
-        self.main_view = self.main_view_class(app=self)
-        self.page.views.clear()
-        await self.view_change()
+        self.client = Client(
+            page=page,
+            routes=self.routes,
+            view_main=self.view_main,
+            view_error=self.view_error,
+            theme=self.theme
+        )
+        await self.client.change_view(
+            view=self.view_main(),
+        )

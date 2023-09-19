@@ -21,29 +21,29 @@ class SearchView(View):
         )
 
     async def get_back(self, e):
-        await self.app.view_change(
+        await self.client.view_change(
             go_back=True,
         )
 
     async def build(self):
-        queries = self.app.session.search_queries.copy()
+        queries = self.client.page.session.get('search_queries')
         queries.reverse()
         self.search_field = TextField(
-            border_color=self.app.theme.primary_color,
-            focused_color=self.app.theme.primary_color,
-            cursor_color=self.app.theme.primary_color,
+            border_color=self.client.theme.primary_color,
+            focused_color=self.client.theme.primary_color,
+            cursor_color=self.client.theme.primary_color,
             cursor_width=2,
             label='Поиск',
             label_style=TextStyle(
-                font_family=self.app.theme.text_style_small_regular.font_family,
-                color=self.app.theme.primary_color,
-                size=self.app.theme.text_style_medium_regular.size,
+                font_family=self.client.theme.text_style_small_regular.font_family,
+                color=self.client.theme.primary_color,
+                size=self.client.theme.text_style_medium_regular.size,
             ),
             focused_bgcolor='black',
             text_style=TextStyle(
-                font_family=self.app.theme.text_style_small_regular.font_family,
-                color=self.app.theme.primary_color,
-                size=self.app.theme.text_style_large_regular.size,
+                font_family=self.client.theme.text_style_small_regular.font_family,
+                color=self.client.theme.primary_color,
+                size=self.client.theme.text_style_large_regular.size,
             ),
             border=InputBorder.NONE,
             visible=True,
@@ -52,7 +52,7 @@ class SearchView(View):
         )
         self.back_button = IconButton(
             icon=icons.CLOSE_OUTLINED,
-            icon_color=self.app.theme.primary_color,
+            icon_color=self.client.theme.primary_color,
             icon_size=40,
             on_click=self.get_back,
         )
@@ -83,7 +83,7 @@ class SearchView(View):
                 border=border.only(
                     bottom=BorderSide(
                         width=1,
-                        color=self.app.theme.secondary_color_dark
+                        color=self.client.theme.secondary_color_dark
                     )
                 ),
             ),
@@ -99,7 +99,7 @@ class SearchView(View):
                                             value=query,
                                             style=TextThemeStyle.BODY_MEDIUM,
                                             no_wrap=False,
-                                            color=self.app.theme.primary_color
+                                            color=self.client.theme.primary_color
                                         ),
                                         alignment=alignment.center_left,
                                     ),
@@ -107,7 +107,7 @@ class SearchView(View):
                                         content=Icon(
                                             name=icons.ACCESS_TIME_ROUNDED,
                                             size=30,
-                                            color=self.app.theme.primary_color,
+                                            color=self.client.theme.primary_color,
                                         ),
                                         alignment=alignment.center_right,
                                     ),
@@ -117,7 +117,7 @@ class SearchView(View):
                             border=border.only(
                                 bottom=BorderSide(
                                     width=1,
-                                    color=self.app.theme.secondary_color
+                                    color=self.client.theme.secondary_color
                                 )
                             ),
                             padding=padding.only(

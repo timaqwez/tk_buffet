@@ -19,11 +19,13 @@ from inspect import getfullargspec
 
 from flet_core import Text, View
 
+from flet_manager.controls import Client
+
 
 class BaseView(View):
     route: str = '/'
-    app: None
-    controls: list
+    title: str = 'View'
+    client: Client
     params: dict
 
     def __init__(self, **kwargs):

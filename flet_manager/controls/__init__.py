@@ -15,5 +15,9 @@
 #
 
 
+from flet_manager.controls.client import Client
+
+
 __all__ = [
+    Client,
 ]
